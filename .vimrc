@@ -1,33 +1,46 @@
 set encoding=UTF-8
-set nocompatible             
-execute pathogen#infect()
+" Auto Install Vim-Plug
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 syntax on
+set nocompatible              " be iMproved, required
+execute pathogen#infect()
 filetype plugin indent on
 call plug#begin('~/.vim/plugged')
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'puremourning/vimspector'
 Plug 'preservim/nerdtree'
-Plug 'leafoftree/vim-svelte-plugin'
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'ryanoasis/vim-devicons'
+Plug 'leafoftree/vim-svelte-plugin'
 Plug 'https://github.com/PhilRunninger/nerdtree-visual-selection.git'
-call plug#end()
-filetype plugin indent on
+Plug 'prettier/vim-prettier', {'do': 'npm install'}
+Plug 'airblade/vim-gitgutter'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+call plug#end()            " required
+filetype plugin indent on    " required
 
-colorscheme simple-dark" awesome colorscheme
+colorscheme simple-dark
 :set relativenumber
+set number
 
+vmap +y :w! /tmp/.vbuf<CR>                                                                   
+nmap +p :r! cat /tmp/.vbuf<CR>
+
+" Fuzzy file finder
+let g:fzf_preview_window = ['right:60%']
+noremap <S-F> :Files<cr>
+noremap <C-F> :Ag<cr>
 let g:coc_disable_startup_warning = 1
-let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 autocmd FileType javascript setlocal equalprg=js-beautify\ --stdin
+let g:prettier#autoformat = 0
+autocmd BufWritePre *.svelte,*.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
 
-
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-
-if executable('rg')
-	  let g:ctrlp_user_command = 'rg %s --files --hidden --color=never --glob ""'
-endif
+" autocmd StdinReadPre * let s:std_in=1
+" autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+let NERDTreeShowHidden=1
